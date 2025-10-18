@@ -12,7 +12,7 @@ const MemoriesPanel = () => {
      {/*just created it for symitry add any feature but make sure it is buggy*/}    
     
     <div>
-        <img src="/gray_eye.png" alt="scary eye image" />
+        <img src="/dark_eye.png" alt="scary eye image" />
     </div>
     <div className="text-center text-green-400 font-mono p-8">
       <h1 className="font-press-start text-3xl mb-2">MEMORIES ARCHIVE</h1>
