@@ -1,17 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Upload, Camera } from "lucide-react";
-import SendData from "../../requests.js";
+import { useGlobalData } from "../../context/globalcontext";
 import { useNavigate } from "react-router-dom";
 
 export default function Mission() {
   const [selectedImage, setSelectedImage] = useState(null);
+  const { userData, setUserData } = useGlobalData();
   const [displayText, setDisplayText] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    occupation: "",
-    fondestMemory: "",
-    darkestSecret: "",
-  });
   const fileInputRef = useRef(null);
   const fullText = "CREATE_REPLICA.exe";
   const navigate = useNavigate();
@@ -32,7 +26,9 @@ export default function Mission() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      const imageURL = URL.createObjectURL(file);
+      setSelectedImage(imageURL);
+      setUserData((prev) => ({ ...prev, image: imageURL }));
     }
   };
 
@@ -47,18 +43,27 @@ export default function Mission() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const SendData = async (data) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (err) {
+      console.error("Error sending data:", err);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await SendData({ ...formData, image: selectedImage });
+    await SendData(userData);
     navigate("/loading");
   };
-
   return (
     <div
       className="min-h-screen bg-black text-green-400 p-6"
@@ -173,7 +178,7 @@ export default function Mission() {
                 </div>
                 <textarea
                   name={field.field}
-                  value={formData[field.field]}
+              
                   onChange={handleInputChange}
                   rows={field.rows || 1}
                   className="w-full bg-black border border-green-400/30 p-2 text-green-400 font-mono text-sm focus:outline-none focus:border-green-400 focus:bg-green-400/5 resize-none leading-relaxed"

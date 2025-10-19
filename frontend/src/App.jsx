@@ -1,21 +1,67 @@
-import { useState, useRef } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import TerminalPanel from "./componentes/pages/landing";
-import MissionPage from "./componentes/pages/mission";
-import Loadingpage from "./componentes/pages/loading";
-import FinalMessage from "./componentes/pages/finalMessage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useRef, useState } from "react";
+import { GlobalProvider } from "./context/globalcontext";
+import Home from "./componentes/pages/landing";
+import Mission from "./componentes/pages/mission";
 import MirrorMindPanel from "./componentes/pages/mirror";
+import FinalMessage from "./componentes/pages/finalMessage";
+import Loading from "./componentes/pages/loading";
 
 function App() {
+  const audioRef = useRef(null);
+  const [started, setStarted] = useState(false);
+
+  const handleStart = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = 1;
+      audio.play().catch(console.warn);
+    }
+    setStarted(true);
+  };
+
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/mission" element={<MissionPage />} />
-        <Route path="/loading" element={<Loadingpage />} />
-        <Route path="/mirror" element={<MirrorMindPanel />} />
-        <Route path="/final" element={<FinalMessage />} />
-        <Route path="/" element={<TerminalPanel />} />
-      </Routes>
+      <GlobalProvider>
+        <audio ref={audioRef} preload="auto" loop>
+          <source src="/thrilling_audio.opus" type="audio/ogg; codecs=opus" />
+          Your browser does not support the OPUS audio format.
+        </audio>
+
+        {!started ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100vh",
+              background: "black",
+              color: "white",
+              flexDirection: "column",
+            }}
+          >
+            <h2>🎧 Click to Begin</h2>
+            <button
+              onClick={handleStart}
+              style={{
+                padding: "10px 20px",
+                fontSize: "18px",
+                cursor: "pointer",
+              }}
+            >
+              Start Experience
+            </button>
+          </div>
+        ) : (
+          <Routes>
+            <Route path="/mission" element={<Mission />} />
+            <Route path="/loading" element={<Loading />} />
+            <Route path="/mirror" element={<MirrorMindPanel />} />
+            <Route path="/final" element={<FinalMessage />} />
+            <Route path="/" element={<Home />} />
+          </Routes>
+        )}
+      </GlobalProvider>
     </BrowserRouter>
   );
 }

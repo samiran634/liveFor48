@@ -3,8 +3,37 @@ import { Camera, Circle } from "lucide-react";
 import { getKnowledgeReply } from "../api/replies.jsx";
 import ReflectionLoader from "../parts/reflectionLoader.jsx";
 import { mirro_function } from "../api/make_mirror.jsx";
+import { useGlobalData } from "../../context/globalcontext.jsx";
+
 
 const MirrorMindPanel = () => {
+    const { audioRef } = useGlobalData();
+useEffect(() => {
+  let interval;
+  const stopAudio = () => {
+    const audio = audioRef?.current;
+    if (audio && !audio.paused) {
+      audio.pause();
+      audio.currentTime = 0;
+      console.log("🔇 Audio stopped successfully");
+      clearInterval(interval);
+    }
+  };
+
+  interval = setInterval(() => {
+    if (audioRef?.current) stopAudio();
+  }, 100);
+
+  // Stop trying after 2 seconds just in case
+  const timeout = setTimeout(() => clearInterval(interval), 2000);
+
+  return () => {
+    clearInterval(interval);
+    clearTimeout(timeout);
+  };
+}, [audioRef]);
+
+
   const [messages, setMessages] = useState([
     {
       role: "ai",
@@ -63,6 +92,7 @@ const MirrorMindPanel = () => {
       addMessage(reply.response || reply.text || reply, "ai");
     } catch (err) {
       addMessage("...the mirror distorts (connection lost).", "ai");
+      console.log(err);
     } finally {
       setIsProcessing(false);
     }
@@ -79,30 +109,6 @@ const MirrorMindPanel = () => {
           <p className="text-center text-gray-400 mb-4">
             // What will I know about you in 48 hours?
           </p>
-
-          <label
-            htmlFor="upload"
-            className="border border-green-600 border-dashed rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-green-950/20 transition mb-4"
-          >
-            {imageFile ? (
-              <span className="text-green-400">
-                ✅ Uploaded: {imageFile.name}
-              </span>
-            ) : (
-              <>
-                <Camera className="w-6 h-6 mb-2" />
-                <p>Upload your face</p>
-              </>
-            )}
-          </label>
-          <input
-            type="file"
-            id="upload"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImage}
-          />
-
           <div
             ref={chatRef}
             className="flex-1 overflow-y-auto bg-gray-900/30 rounded-md p-3 space-y-3 border border-green-800/30"
@@ -144,7 +150,7 @@ const MirrorMindPanel = () => {
             YOUR MIRROR
           </h2>
           {isProcessing || !imageFile ? (
-            <ReflectionLoader />
+           "somethig will be here"
           ) : (
             <video
               src="https://placehold.co/600x400/000000/39A53D.mp4?text=Reflection"
