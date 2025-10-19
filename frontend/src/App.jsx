@@ -51,7 +51,7 @@ function App() {
         onClick={() => navigate(-1)}
         className={`absolute left-4 top-1/2 -translate-y-1/2 text-4xl text-green-400 font-bold hover:text-green-300 transition ${
           current === 0 ? "opacity-0 pointer-events-none" : ""
-        }`}
+        } ` }
       >
         &lt;
       </button>

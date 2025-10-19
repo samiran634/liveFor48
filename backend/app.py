@@ -65,7 +65,7 @@ def knowledge_api():
         }
 
         model = genai.GenerativeModel(
-            model_name="gemini-1.0-pro",
+            model_name="gemini-2.5-flash",
             generation_config=generation_config,
             system_instruction=system_prompt
         )
@@ -73,22 +73,27 @@ def knowledge_api():
         chat = model.start_chat(history=history)
         response = chat.send_message(user_text)
         
+        # Convert history to a JSON-serializable format
+        serializable_history = [
+            {'role': msg.role, 'parts': [part.text for part in msg.parts]}
+            for msg in chat.history
+        ]
+        
         return jsonify({
             "response": response.text,
-            "history": chat.history # Send back the updated history
+            "history": serializable_history
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-# --- Endpoint 2: Image + Text to Video API (D-ID) ---
+# --- Endpoint 2: Image Upload + Text to Video API (D-ID) ---
 @app.route("/generate-video", methods=["POST"])
 def generate_video():
     if not D_ID_API_KEY or not BASE_URL:
         return jsonify({"error": "D_ID_API_KEY or BASE_URL not configured"}), 500
 
-    # 1. Check for inputs
     if 'image' not in request.files:
         return jsonify({"error": "No 'image' file part"}), 400
     
@@ -96,22 +101,49 @@ def generate_video():
     if not text_input:
         return jsonify({"error": "No 'text' form data"}), 400
 
-    # 2. Save the uploaded image temporarily
     file = request.files['image']
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    # Create a unique filename
     filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
-    # 3. Create the public URL for D-ID to access
     image_public_url = f"{BASE_URL}/{filepath}"
     
-    # 4. Create the talk with D-ID
+    # Delegate the actual D-ID call to the helper function
+    try:
+        result = create_talk(image_public_url, text_input)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# --- NEW Endpoint 3: Create Talk from URL (D-ID) ---
+@app.route("/talk", methods=["POST"])
+def talk_endpoint():
+    if not D_ID_API_KEY:
+        return jsonify({"error": "D_ID_API_KEY not configured"}), 500
+
+    data = request.json
+    image_url = data.get("source_url")
+    text = data.get("text")
+
+    if not image_url or not text:
+        return jsonify({"error": "Missing 'source_url' or 'text' in request body"}), 400
+    
+    # Delegate the D-ID call to the helper function
+    try:
+        result = create_talk(image_url, text)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# --- Helper Function for D-ID API Call ---
+def create_talk(image_source_url, text_input):
+    """Helper function to create a talk with D-ID and poll for the result."""
     d_id_url = "https://api.d-id.com/talks"
-    # Basic Auth key (D-ID key is 'username:password')
     auth_header = "Basic " + base64.b64encode(D_ID_API_KEY.encode()).decode()
 
     payload = {
@@ -119,7 +151,7 @@ def generate_video():
             "type": "text",
             "input": text_input
         },
-        "source_url": image_public_url,
+        "source_url": image_source_url,
         "config": {
             "stitch": "true"
         }
@@ -131,17 +163,15 @@ def generate_video():
     }
 
     try:
-        # POST to create the video job
         create_response = requests.post(d_id_url, json=payload, headers=headers)
-        create_response.raise_for_status() # Raise error for bad responses
+        create_response.raise_for_status()
         talk_id = create_response.json().get("id")
 
         if not talk_id:
-            return jsonify({"error": "Failed to create talk", "details": create_response.json()}), 500
+            raise Exception(f"Failed to create talk: {create_response.json()}")
 
-        # 5. Poll for the video result
         result_url = None
-        for _ in range(30): # Poll for ~60 seconds (30 * 2s)
+        for _ in range(30): # Poll for ~60 seconds
             time.sleep(2)
             get_response = requests.get(f"{d_id_url}/{talk_id}", headers=headers)
             get_response.raise_for_status()
@@ -153,18 +183,17 @@ def generate_video():
                 result_url = talk_data.get("result_url")
                 break
             elif status == "error":
-                return jsonify({"error": "D-ID video generation failed", "details": talk_data}), 500
+                raise Exception(f"D-ID video generation failed: {talk_data}")
         
-        # 6. Return the final video URL
         if result_url:
-            return jsonify({"video_url": result_url})
+            return {"video_url": result_url}
         else:
-            return jsonify({"error": "Video generation timed out"}), 500
+            raise Exception("Video generation timed out")
 
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"API request failed: {str(e)}"}), 500
+        raise Exception(f"API request failed: {e.response.text if e.response else str(e)}")
     except Exception as e:
-        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+        raise e
 
 
 if __name__ == "__main__":

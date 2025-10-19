@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Camera, Circle } from "lucide-react";
+import { getKnowledgeReply } from "../api/replies.jsx";
+import ReflectionLoader from "../parts/reflectionLoader.jsx";
+import { mirro_function } from "../api/make_mirror.jsx";
 
 const MirrorMindPanel = () => {
   const [messages, setMessages] = useState([
@@ -24,28 +27,32 @@ const MirrorMindPanel = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!imageFile || isProcessing) return;
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!imageFile || isProcessing) return;
 
-    const userInput = e.target.userInput.value.trim();
-    if (!userInput) return;
-    addMessage(userInput, "user");
-    e.target.userInput.value = "";
-    setIsProcessing(true);
+  const userInput = e.target.userInput.value.trim();
+  if (!userInput) return;
 
-    setTimeout(() => {
-      const replies = [
-        "Interesting. I see a flicker of doubt in that statement.",
-        "Why do you think that is? Be honest.",
-        "That contradicts something you implied earlier.",
-        "You're hiding something. The reflection doesn't lie.",
-        "A logical fallacy. Predictable.",
-      ];
-      addMessage(replies[Math.floor(Math.random() * replies.length)], "ai");
-      setIsProcessing(false);
-    }, 2500);
-  };
+  addMessage(userInput, "user");
+  e.target.userInput.value = "";
+  setIsProcessing(true);
+
+  try {
+    const reply = await getKnowledgeReply(
+      userInput,
+      messages,
+      mirro_function, // <--- Pass callback here
+      imageFile  // <--- and the uploaded file
+    );
+    addMessage(reply.response || reply.text || reply, "ai");
+  } catch (err) {
+    addMessage("...the mirror distorts (connection lost).", "ai");
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
 
   return (
     <div className="flex flex-col md:flex-row w-full h-full bg-black text-green-400 font-mono">
@@ -98,10 +105,7 @@ const MirrorMindPanel = () => {
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <h2 className="font-press-start text-green-400 text-lg mb-4">YOUR MIRROR</h2>
         {isProcessing || !imageFile ? (
-          <div className="flex flex-col items-center justify-center h-64 w-full border border-green-800 rounded-lg">
-            <Circle className="w-12 h-12 mb-3 text-green-500 animate-pulse" />
-            <p className="text-gray-400">Awaiting reflection...</p>
-          </div>
+          <ReflectionLoader/>
         ) : (
           <video
             src="https://placehold.co/600x400/000000/39A53D.mp4?text=Reflection"
