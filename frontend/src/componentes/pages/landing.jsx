@@ -1,24 +1,50 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { PowerGlitch } from "powerglitch";
 
 export default function Home() {
-  const [glitch, setGlitch] = useState(false);
   const [time, setTime] = useState(48 * 60 * 60);
+  const [showInitialContent, setShowInitialContent] = useState(true);
+  const glitchRef = useRef(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGlitch(true);
-      setTimeout(() => setGlitch(false), 100);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
+  // Countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
       setTime((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Apply glitch effect
+  // useEffect(() => {
+  //   if (glitchRef.current) {
+  //     PowerGlitch.glitch(glitchRef.current, {
+  //       playMode: "always",
+  //       optimizeSeo: true,
+  //       createContainers: true,
+  //       hideOverflow: false,
+  //       timing: { duration: 1950 },
+  //       glitchTimeSpan: { start: 0.67, end: 1 },
+  //       shake: { velocity: 15, amplitudeX: 0, amplitudeY: 0.2 },
+  //       slice: {
+  //         count: 4,
+  //         velocity: 12,
+  //         minHeight: 0.02,
+  //         maxHeight: 0.06,
+  //         hueRotate: true,
+  //         cssFilters: "",
+  //       },
+  //       pulse: false,
+  //     });
+  //   }
+  // }, []);
+
+  // Hide initial content after animations complete + 5 seconds
+  useEffect(() => {
+    const hideTimer = setTimeout(() => {
+      setShowInitialContent(false);
+    }, 17000); // 8.7s (last animation) + 1s (animation duration) + 5s + 2.3s buffer = 17s
+
+    return () => clearTimeout(hideTimer);
   }, []);
 
   const hours = Math.floor(time / 3600);
@@ -28,11 +54,18 @@ export default function Home() {
     minutes
   ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
+  const handleStartMission = () => {
+    // Add your navigation logic here
+    // If using react-router-dom: navigate("/mission");
+    // Or window.location.href = "/mission";
+    console.log("Navigating to mission...");
+  };
+
   return (
     <main className="relative w-full h-screen overflow-hidden">
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center animate-fadeInBackground"
         style={{
           backgroundImage:
             'url("https://www.countdowns.live/_next/image?url=%2Fbackgrounds%2Fdystopian.gif&w=3840&q=75")',
@@ -41,67 +74,90 @@ export default function Home() {
       />
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-black/40 animate-fadeInBackground" />
 
-      {/* Content */}
-      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
-        {/* Main Text */}
-        <div className="text-center px-4">
-          <h1
-            className={`text-6xl font-bold mb-6 transition-all duration-100 md:text-6xl ${
-              glitch ? "translate-x-1 opacity-90" : "translate-x-0 opacity-100"
-            }`}
-            style={{
-              color: "#ffffff",
-              textShadow:
-                "0 0 30px rgba(255, 68, 68, 0.8), 0 0 60px rgba(255, 68, 68, 0.4)",
-              letterSpacing: "0.08em",
-              fontFamily: "system-ui, -apple-system, sans-serif",
-            }}
-          >
-            {"AI HAS TAKEN OVER"}
-          </h1>
+      {/* Initial Content */}
+      {showInitialContent && (
+        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center animate-fadeOut">
+          <div className="text-center px-4">
+            {/* Glitch H1 */}
+            <h1
+              ref={glitchRef}
+              className="text-6xl font-bold mb-6 md:text-6xl animate-fadeInSlideDown"
+              style={{
+                color: "#ffffff",
+                textShadow:
+                  "0 0 30px rgba(255, 68, 68, 0.8), 0 0 60px rgba(255, 68, 68, 0.4)",
+                letterSpacing: "0.08em",
+                fontFamily: "system-ui, -apple-system, sans-serif",
+              }}
+            >
+              AI HAS TAKEN OVER
+            </h1>
 
-          <div className="h-1 w-64 mx-auto mb-8 bg-gradient-to-r from-transparent via-red-600 to-transparent" />
+            <div className="h-1 w-64 mx-auto mb-8 bg-gradient-to-r from-transparent via-red-600 to-transparent animate-fadeInSlideDown" />
 
-          <div className="mt-12 text-center">
-            <div className="w-full max-w-2xl mx-auto bg-transparent   p-6">
-              <div className="text-sm text-gray-300 mb-4 font-light tracking-widest">
-                TIME REMAINING
-              </div>
-              <div
-                className="text-4xl font-mono font-bold mb-6"
-                style={{
-                  color: "#ff4444",
-                  textShadow: "0 0 20px rgba(255, 68, 68, 0.6)",
-                }}
-              >
-                {time === 0 ? "SYSTEM OFFLINE" : timeString}
-              </div>
+            <div className="mt-12 text-center">
+              <div className="w-full max-w-2xl mx-auto bg-transparent p-6 animate-fadeInSlideUp">
+                <div className="text-sm text-gray-300 mb-4 font-light tracking-widest">
+                  TIME REMAINING
+                </div>
+                <div
+                  className="text-4xl font-mono font-bold mb-6"
+                  style={{
+                    color: "#ff4444",
+                    textShadow: "0 0 20px rgba(255, 68, 68, 0.6)",
+                  }}
+                >
+                  {time === 0 ? "SYSTEM OFFLINE" : timeString}
+                </div>
 
-              <div className="text-red-400 font-light tracking-widest text-lg">
-                YOU ARE OUR LAST HOPE
-              </div>
-              <div className="mt-6 text-center">
-                <div className="text-container">
-                  <span className="font-creepster-main">Now, You Have to </span>
-                  <span className="font-creepster-highlight"> Confess</span>
+                <div className="text-red-400 font-light tracking-widest text-lg animate-fadeInSlideUpHope">
+                  YOU ARE OUR LAST HOPE
+                </div>
+                <div className="mt-6 text-center animate-fadeInSlideUpConfess">
+                  <div className="text-container">
+                    <span className="font-creepster-main">
+                      Now, You Have to{" "}
+                    </span>
+                    <span className="font-creepster-highlight"> Confess</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Animated Scanlines */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, rgba(255, 68, 68, 0.02) 0px, rgba(255, 68, 68, 0.02) 1px, transparent 1px, transparent 2px)",
-            animation: "scan 8s linear infinite",
-          }}
-        />
-      </div>
+          {/* Animated Scanlines */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, rgba(255, 68, 68, 0.02) 0px, rgba(255, 68, 68, 0.02) 1px, transparent 1px, transparent 2px)",
+              animation: "scan 8s linear infinite",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Start Mission Button */}
+      {!showInitialContent && (
+        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center animate-fadeInButton">
+          <div className="text-center">
+            <button
+              onClick={handleStartMission}
+              className="mission-button group relative px-8 py-4 text-2xl font-bold text-white bg-red-600 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-110 hover:bg-red-700"
+              style={{
+                boxShadow:
+                  "0 0 30px rgba(255, 68, 68, 0.8), 0 0 60px rgba(255, 68, 68, 0.5)",
+                border: "2px solid #ff4444",
+              }}
+            >
+              <span className="relative z-10">START MISSION</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-red-500 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+            </button>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes scan {

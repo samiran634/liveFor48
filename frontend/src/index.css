@@ -1,9 +1,11 @@
 @import "tailwindcss";
+
 .font-creepster {
   font-family: "Creepster", cursive;
 }
+
 .text-container {
-  font-family: "Fredoka One", sans-serif; /* keep for the parent div */
+  font-family: "Fredoka One", sans-serif;
   font-size: 1.75rem;
   letter-spacing: 0.05em;
   color: #e0e0e0;
@@ -13,7 +15,7 @@
   font-family: "Creepster", cursive;
   font-size: 1.8rem;
   color: #ffffff;
-  font-weight: 500; /* semi-bold equivalent */
+  font-weight: 500;
 }
 
 .font-creepster-highlight {
@@ -22,4 +24,121 @@
   color: #ff3333;
   font-weight: bold;
   text-shadow: 0 0 15px rgba(255, 51, 51, 1), 0 0 20px rgba(255, 51, 51, 0.6);
+}
+
+/* Storytelling Animation Keyframes */
+
+/* 1. Background fade-in (0-3s) */
+@keyframes fadeInBackground {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 2. Heading slide down (starts at 4s) */
+@keyframes fadeInSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 3. Time remaining box slide up (starts at 6s) */
+@keyframes fadeInSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 4. "You are our last hope" text (starts at 7.5s) */
+@keyframes fadeInSlideUpHope {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 5. "Confess" text (starts at 8.7s) */
+@keyframes fadeInSlideUpConfess {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 6. Fade out animation for all content (starts at 13s, lasts 4s) */
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 7. Button fade in with scale animation (slow and dramatic) */
+@keyframes fadeInButton {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animation Classes */
+.animate-fadeInBackground {
+  opacity: 0;
+  animation: fadeInBackground 3s ease-in forwards;
+}
+
+.animate-fadeInSlideDown {
+  opacity: 0;
+  animation: fadeInSlideDown 1.9s ease-out 4s forwards;
+}
+
+.animate-fadeInSlideUp {
+  opacity: 0;
+  animation: fadeInSlideUp 1.2s ease-out 6s forwards;
+}
+
+.animate-fadeInSlideUpHope {
+  opacity: 0;
+  animation: fadeInSlideUpHope 1s ease-out 7.5s forwards;
+}
+
+.animate-fadeInSlideUpConfess {
+  opacity: 0;
+  animation: fadeInSlideUpConfess 1s ease-out 8.7s forwards;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 4s ease-out 13s forwards;
+}
+
+.animate-fadeInButton {
+  opacity: 0;
+  animation: fadeInButton 3s ease-out 0s forwards;
 }
