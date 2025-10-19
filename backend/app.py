@@ -11,8 +11,17 @@ import google.generativeai as genai
 # --- Configuration ---
 load_dotenv()
 app = Flask(__name__)
-CORS(app)  # Allow frontend to call this backend
-CORS(app, origins=["https://live-for48.vercel.app", "http://localhost:5173"])
+
+# Configure CORS properly - allow all origins with all methods
+CORS(app, resources={
+    r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Type"],
+        "supports_credentials": False
+    }
+})
 
 # Folder to store uploaded images
 UPLOAD_FOLDER = 'static/uploads'
