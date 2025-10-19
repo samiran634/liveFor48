@@ -3,6 +3,22 @@ import { PowerGlitch } from "powerglitch";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+//for audio
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+      // Remove listener after first play
+      document.removeEventListener("click", playAudio);
+    };
+
+    document.addEventListener("click", playAudio);
+    return () => document.removeEventListener("click", playAudio);
+  }, []);
+
   const [time, setTime] = useState(48 * 60 * 60);
   const [showInitialContent, setShowInitialContent] = useState(true);
   const [showMissionButton, setShowMissionButton] = useState(false);
@@ -45,7 +61,7 @@ export default function Home() {
     const hideTimer = setTimeout(() => {
       setShowInitialContent(false);
       setTimeout(() => setShowMissionButton(true), 1000); // small delay for fade
-    }, 17000);
+    }, 20000);
     return () => clearTimeout(hideTimer);
   }, []);
 
@@ -57,27 +73,19 @@ export default function Home() {
   ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
   const handleStartMission = () => {
-<<<<<<< HEAD
-    console.log("Navigating to mission...");
-    // window.location.href = "/mission";
-=======
     // Add your navigation logic here
     // If using react-router-dom: navigate("/mission");
     // Or window.location.href = "/mission";
     navigate("/mission");
->>>>>>> c19b18e8e2b089bfddea74635bdbf0198d337a23
   };
 
   return (
     <main className="relative w-full h-screen overflow-hidden">
       {/* Optional Ambient Sound */}
-      <audio
-        src="/sounds/ambient.ogg"
-        autoPlay
-        loop
-        preload="auto"
-        volume="0.3"
-      />
+      <audio ref={audioRef} preload="auto" loop>
+        <source src="/thrilling_audio.opus" type="audio/ogg; codecs=opus" />
+        Your browser does not support the OPUS audio format.
+      </audio>
 
       {/* Background Image */}
       <div
