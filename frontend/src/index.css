@@ -116,26 +116,26 @@
 
 .animate-fadeInSlideDown {
   opacity: 0;
-  animation: fadeInSlideDown 1.9s ease-out 4s forwards;
+  animation: fadeInSlideDown 1.4s ease-out 4s forwards;
 }
 
 .animate-fadeInSlideUp {
   opacity: 0;
-  animation: fadeInSlideUp 1.2s ease-out 6s forwards;
+  animation: fadeInSlideUp 1.5s ease-out 6.6s forwards;
 }
 
 .animate-fadeInSlideUpHope {
   opacity: 0;
-  animation: fadeInSlideUpHope 1s ease-out 7.5s forwards;
+  animation: fadeInSlideUpHope 1.2s ease-out 8.3s forwards;
 }
 
 .animate-fadeInSlideUpConfess {
   opacity: 0;
-  animation: fadeInSlideUpConfess 1s ease-out 8.7s forwards;
+  animation: fadeInSlideUpConfess 1s ease-out 10.5s forwards;
 }
 
 .animate-fadeOut {
-  animation: fadeOut 4s ease-out 13s forwards;
+  animation: fadeOut 3s ease-out 13s forwards;
 }
 
 .animate-fadeInButton {
