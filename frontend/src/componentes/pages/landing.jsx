@@ -125,7 +125,7 @@ export default function Home() {
             <div className="mt-12 text-center">
               <div className="w-full max-w-2xl mx-auto bg-transparent p-6 animate-fadeInSlideUp">
                 <div className="text-sm text-gray-300 mb-4 font-light tracking-widest">
-                  TIME REMAINING
+                  You only have
                 </div>
                 <div
                   className={`text-4xl font-mono font-bold mb-6 ${
@@ -140,12 +140,17 @@ export default function Home() {
                 </div>
 
                 <div className="text-red-400 font-light tracking-widest text-lg animate-fadeInSlideUpHope">
-                  YOU ARE OUR LAST HOPE
+                  We are the last Humans left
                 </div>
                 <div className="mt-6 text-center animate-fadeInSlideUpConfess">
                   <div className="text-container">
-                    <span className="font-creepster-main">Now, You Have to </span>
-                    <span className="font-creepster-highlight">Confess</span>
+                    <div className="font-creepster-main">
+                      Our only hope to survive is to become
+                    </div>
+                    <span className="font-creepster-highlight">
+                      {" "}
+                      The Apocalypse Itself
+                    </span>
                   </div>
                 </div>
               </div>
