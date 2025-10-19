@@ -3,7 +3,7 @@
 // =========================
 import { getCreepyPhrase } from "./utility/phrase";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://livefor48.onrender.com";
 let insanityCounter = 0;
 let insanityThreshold = Math.floor(Math.random() * 4) + 5; 
 // Random between 5 and 9 messages
