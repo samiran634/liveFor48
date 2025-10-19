@@ -6,7 +6,7 @@ export async function mirro_function (imageFile, text){
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text: `${text}${extraPrompt}`,
-        source_url:imageFile
+        imageFile:imageFile
       }),
     });
 
