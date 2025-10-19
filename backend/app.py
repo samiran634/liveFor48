@@ -122,32 +122,35 @@ def generate_video():
 # --- NEW Endpoint 3: Create Talk from URL (D-ID) ---
 @app.route("/talk", methods=["POST"])
 def talk_endpoint():
-    if not D_ID_API_KEY:
-        return jsonify({"error": "D_ID_API_KEY not configured"}), 500
+    if not D_ID_API_KEY or not BASE_URL:
+        return jsonify({"error": "D_ID_API_KEY or BASE_URL not configured"}), 500
 
-    data = request.json
-    ##png formatted is expeced here 
-    image = data.get("imageFile")##take image png 
-    text = data.get("text")
+    # The frontend should send multipart/form-data with 'image' (blob) and 'text'
+    if 'image' not in request.files:
+        return jsonify({"error": "No 'image' file uploaded"}), 400
+
+    text = request.form.get("text")
+    if not text:
+        return jsonify({"error": "Missing 'text' field"}), 400
+
     file = request.files['image']
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        return jsonify({"error": "Empty file name"}), 400
 
+    # Save the uploaded blob (PNG) locally
     filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
-    image_url=f"{BASE_URL}/{filepath}"
 
-    if not image_url or not text:
-        return jsonify({"error": "Missing 'source_url' or 'text' in request body"}), 400
-    
-    # Delegate the D-ID call to the helper function
+    # Create a publicly accessible URL for D-ID
+    public_url = f"{BASE_URL}/static/uploads/{filename}"
+
+    # Call D-ID API
     try:
-        result = create_talk(image_url, text)
+        result = create_talk(public_url, text)
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 # --- Helper Function for D-ID API Call ---
 def create_talk(image_source_url, text_input):
