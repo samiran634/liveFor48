@@ -82,6 +82,12 @@ export default function Home() {
               <div className="text-red-400 font-light tracking-widest text-lg">
                 YOU ARE OUR LAST HOPE
               </div>
+              <div className="mt-6 text-center">
+                <div className="text-container">
+                  <span className="font-creepster-main">Now, You Have to </span>
+                  <span className="font-creepster-highlight"> Confess</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
