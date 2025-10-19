@@ -136,16 +136,23 @@ const MirrorMindPanel = () => {
         
         const result = await mirro_function(userData.didImageUrl, aiResponse);
         if (result && result.video_url) {
-          setUserData(prev => ({ ...prev, finalVideo: result.video_url }));
+          // Store the video URL in global state first
+          await new Promise((resolve) => {
+            setUserData(prev => {
+              resolve();
+              return { ...prev, finalVideo: result.video_url };
+            });
+          });
+          
           addMessage("Preparing final destruction...", "ai");
           
           // Trigger full screen glitch effect
           setFullScreenGlitch(true);
           
-          // Wait for glitch to complete, then redirect
+          // Wait for glitch to complete and state to update, then redirect
           setTimeout(() => {
             navigate("/destruction");
-          }, 1000);
+          }, 1500);
         }
       } else {
         // Normal chat flow for messages 1 and 2
@@ -171,6 +178,7 @@ const MirrorMindPanel = () => {
     } catch (err) {
       console.error("Error:", err);
       addMessage("...the mirror distorts (connection lost).", "ai");
+      console.log(err);
     } finally {
       setIsGeneratingVideo(false);
       setIsProcessing(false);

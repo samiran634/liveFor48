@@ -6,6 +6,9 @@ import { useGlobalData } from "../../context/GlobalContext.jsx";
 
 export default function Loading() {
   const { userData } = useGlobalData();
+
+  const glitchAudioRef = useRef(null);
+
   const [progress, setProgress] = useState(0);
   const [hasGlitched, setHasGlitched] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -45,7 +48,15 @@ export default function Loading() {
 
   // Apply glitch effect
   useEffect(() => {
+   
     if (hasGlitched && glitchRef.current) {
+         // Play glitch sound exactly when glitch starts
+    if (glitchAudioRef.current) {
+      glitchAudioRef.current.currentTime = 0;
+      glitchAudioRef.current.play().catch((err) => {
+        console.warn("Audio play prevented:", err);
+      });
+    }
       PowerGlitch.glitch(glitchRef.current, {
         playMode: "always",
         optimizeSeo: true,
@@ -93,6 +104,7 @@ export default function Loading() {
       }`}
       style={{ fontFamily: "'Courier New', monospace" }}
     >
+        <audio ref={glitchAudioRef} src="/glitch-effect-1-397982.mp3" preload="auto" />
       {/* Static lines effect */}
       {hasGlitched && (
         <div

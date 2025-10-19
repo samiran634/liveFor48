@@ -7,11 +7,16 @@ const DestructionVideo = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If no final video, redirect back
-    if (!userData.finalVideo) {
-      navigate("/mirror");
-    }
-  }, [userData.finalVideo, navigate]);
+    // Wait a moment for state to propagate, then check
+    const timer = setTimeout(() => {
+      if (!userData.finalVideo) {
+        console.log("No final video found, redirecting back to mirror");
+        navigate("/mirror");
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleVideoEnd = () => {
     // Redirect to final message page after video ends

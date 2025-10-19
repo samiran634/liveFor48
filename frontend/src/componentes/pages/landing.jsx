@@ -81,12 +81,6 @@ export default function Home() {
 
   return (
     <main className="relative w-full h-screen overflow-hidden">
-      {/* Optional Ambient Sound */}
-      <audio ref={audioRef} preload="auto" loop>
-        <source src="/thrilling_audio.opus" type="audio/ogg; codecs=opus" />
-        Your browser does not support the OPUS audio format.
-      </audio>
-
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center animate-fadeInBackground"
