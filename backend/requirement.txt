@@ -4,3 +4,4 @@ requests
 flask-cors
 google-generativeai
 Werkzeug
+gunicorn
