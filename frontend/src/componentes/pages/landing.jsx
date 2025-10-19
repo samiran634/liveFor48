@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { PowerGlitch } from "powerglitch";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [time, setTime] = useState(48 * 60 * 60);
   const [showInitialContent, setShowInitialContent] = useState(true);
   const glitchRef = useRef(null);
+  const navigate = useNavigate();
 
   // Countdown timer
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function Home() {
     // Add your navigation logic here
     // If using react-router-dom: navigate("/mission");
     // Or window.location.href = "/mission";
-    console.log("Navigating to mission...");
+    navigate("/mission");
   };
 
   return (
