@@ -3,7 +3,7 @@
 // =========================
 import { getCreepyPhrase } from "./utility/phrase";
 
-const API_BASE_URL="http://127.0.0.1:5000"
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
 let insanityCounter = 0;
 let insanityThreshold = Math.floor(Math.random() * 4) + 5; 
 // Random between 5 and 9 messages
@@ -20,9 +20,9 @@ const transformHistoryForAPI = (messages) => {
  * @param {string} text - The user input
  * @param {array} history - Chat message history
  * @param {function} onInsanityTrigger - callback to fire when AI "breaks"
- * @param {File} imageFile - uploaded user image
+ * @param {string} didImageUrl - D-ID image URL (already uploaded)
  */
-export const getKnowledgeReply = async (text, history, onInsanityTrigger, imageFile) => {
+export const getKnowledgeReply = async (text, history, onInsanityTrigger, didImageUrl) => {
   try {
     insanityCounter++;
 
@@ -62,8 +62,8 @@ export const getKnowledgeReply = async (text, history, onInsanityTrigger, imageF
       const chosenText = getCreepyPhrase(history, insanityCounter);
 
 
-      // Call the MirrorMindPanel's handler with the image + message
-      onInsanityTrigger(imageFile, chosenText);
+      // Call the MirrorMindPanel's handler with the D-ID image URL + message
+      onInsanityTrigger(didImageUrl, chosenText);
 
       // Reset insanity cycle
       insanityCounter = 0;

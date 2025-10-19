@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PowerGlitch } from "powerglitch";
 import { Skull } from "lucide-react";
+import { useGlobalData } from "../../context/GlobalContext.jsx";
 
 export default function Loading() {
+  const { userData } = useGlobalData();
   const [progress, setProgress] = useState(0);
   const [hasGlitched, setHasGlitched] = useState(false);
   const [showError, setShowError] = useState(false);

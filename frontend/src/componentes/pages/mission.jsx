@@ -2,16 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Upload, Camera } from "lucide-react";
 import SendData from "../../requests.js";
 import { useNavigate } from "react-router-dom";
+import { useGlobalData } from "../../context/GlobalContext.jsx";
 
 export default function Mission() {
-  const [selectedImage, setSelectedImage] = useState(null);
+  const { userData, setUserData } = useGlobalData();
   const [displayText, setDisplayText] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    occupation: "",
-    fondestMemory: "",
-    darkestSecret: "",
-  });
   const fileInputRef = useRef(null);
   const fullText = "CREATE_REPLICA.exe";
   const navigate = useNavigate();
@@ -32,7 +27,12 @@ export default function Mission() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      const imageURL = URL.createObjectURL(file);
+      setUserData((prev) => ({ 
+        ...prev, 
+        imageFile: file,
+        imagePreview: imageURL 
+      }));
     }
   };
 
@@ -47,7 +47,7 @@ export default function Mission() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setUserData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -55,7 +55,7 @@ export default function Mission() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await SendData({ ...formData, image: selectedImage });
+    await SendData(userData);
     navigate("/loading");
   };
 
@@ -88,7 +88,7 @@ export default function Mission() {
               [IDENTITY_SCAN]
             </h2>
 
-            {!selectedImage ? (
+            {!userData.imagePreview ? (
               <div className="space-y-4">
                 <div className="text-gray-500 text-sm mb-4">
                   $ upload_biometric_data --format=image
@@ -124,7 +124,7 @@ export default function Mission() {
                 </div>
                 <div className="border border-green-400/50 p-3 inline-block">
                   <img
-                    src={selectedImage}
+                    src={userData.imagePreview}
                     alt="Selected"
                     className="w-32 h-32 object-cover"
                   />
@@ -132,7 +132,7 @@ export default function Mission() {
                 <div className="text-gray-500 text-xs mt-2">
                   <button
                     type="button"
-                    onClick={() => setSelectedImage(null)}
+                    onClick={() => setUserData(prev => ({ ...prev, imageFile: null, imagePreview: null }))}
                     className="text-green-400 hover:underline"
                   >
                     $ replace_data
@@ -173,7 +173,7 @@ export default function Mission() {
                 </div>
                 <textarea
                   name={field.field}
-                  value={formData[field.field]}
+                  value={userData[field.field] || ""}
                   onChange={handleInputChange}
                   rows={field.rows || 1}
                   className="w-full bg-black border border-green-400/30 p-2 text-green-400 font-mono text-sm focus:outline-none focus:border-green-400 focus:bg-green-400/5 resize-none leading-relaxed"
