@@ -126,8 +126,17 @@ def talk_endpoint():
         return jsonify({"error": "D_ID_API_KEY not configured"}), 500
 
     data = request.json
-    image_url = data.get("source_url")
+    ##png formatted is expeced here 
+    image = data.get("imageFile")##take image png 
     text = data.get("text")
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+    image_url=f"{BASE_URL}/{filepath}"
 
     if not image_url or not text:
         return jsonify({"error": "Missing 'source_url' or 'text' in request body"}), 400
