@@ -22,3 +22,16 @@
   font-weight: bold;
   text-shadow: 0 0 25px rgba(255, 51, 51, 1), 0 0 40px rgba(255, 51, 51, 0.6);
 }
+@keyframes fadeInPage {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-fadeInPage {
+  opacity: 0;
+  animation: fadeInPage 5s ease-in-out forwards;
+}
